@@ -4,7 +4,10 @@ node_modules/
 # Build output
 dist/
 release/
-build/
+build/*
+!build/icon.icns
+!build/icon.ico
+!build/icon.png
 
 # Generated model assets and cache
 public/background-removal/

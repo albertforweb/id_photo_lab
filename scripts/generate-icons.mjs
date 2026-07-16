@@ -60,6 +60,22 @@ function writePngBackedIco(entries, output) {
   writeFileSync(output, ico);
 }
 
+function findMissingIconFiles() {
+  return [iconPng, iconIcns, iconIco].filter((file) => !existsSync(file));
+}
+
+if (process.platform !== "darwin") {
+  const missingIconFiles = findMissingIconFiles();
+  if (missingIconFiles.length > 0) {
+    throw new Error(
+      `Desktop icon generation requires macOS. Missing checked-in icon files: ${missingIconFiles.join(", ")}`,
+    );
+  }
+
+  console.log("Using checked-in desktop icons; generation requires macOS.");
+  process.exit(0);
+}
+
 requireCommand("qlmanage");
 requireCommand("sips");
 requireCommand("iconutil");
