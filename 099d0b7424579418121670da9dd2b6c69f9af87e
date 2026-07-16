@@ -1,0 +1,336 @@
+{
+  "version": 2,
+  "schemaVersion": 2,
+  "source": "mantis",
+  "sourceVersion": "0.2.221",
+  "generatedAt": "2026-07-16T07:18:09.860Z",
+  "files": [
+    {
+      "file": ".github/workflows/release.yml",
+      "action": "edited",
+      "linesAffected": 1,
+      "linesAdded": 1,
+      "linesDeleted": 1,
+      "totalLines": 103,
+      "assistant": null
+    },
+    {
+      "file": ".gitignore",
+      "action": "edited",
+      "linesAffected": 4,
+      "linesAdded": 4,
+      "linesDeleted": 1,
+      "totalLines": 27,
+      "assistant": null
+    },
+    {
+      "file": "build/icon.icns",
+      "action": "added",
+      "linesAffected": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0,
+      "totalLines": 7645,
+      "assistant": null
+    },
+    {
+      "file": "build/icon.ico",
+      "action": "added",
+      "linesAffected": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0,
+      "totalLines": 706,
+      "assistant": null
+    },
+    {
+      "file": "build/icon.png",
+      "action": "added",
+      "linesAffected": 0,
+      "linesAdded": 0,
+      "linesDeleted": 0,
+      "totalLines": 4275,
+      "assistant": null
+    },
+    {
+      "file": "scripts/generate-icons.mjs",
+      "action": "edited",
+      "linesAffected": 16,
+      "linesAdded": 16,
+      "linesDeleted": 0,
+      "totalLines": 135,
+      "assistant": null
+    }
+  ],
+  "hunks": [
+    {
+      "schemaVersion": 2,
+      "recordType": "hunk",
+      "hunkId": "staged:1:.github/workflows/release.yml",
+      "operationId": null,
+      "filePath": null,
+      "relativePath": ".github/workflows/release.yml",
+      "oldStart": 45,
+      "oldLines": 1,
+      "newStart": 45,
+      "newLines": 1,
+      "linesAdded": 1,
+      "linesDeleted": 1,
+      "attribution": {
+        "bucket": "human_only",
+        "contributors": [
+          {
+            "actor": "human",
+            "tool": null,
+            "source": "mantis-managed-cli.manual-fallback",
+            "operationId": null,
+            "evidenceLevel": "inferred"
+          }
+        ],
+        "actors": [
+          "human"
+        ],
+        "aiInvolved": false,
+        "humanInvolved": true,
+        "toolInvolved": false,
+        "unknownInvolved": false
+      },
+      "evidence": {
+        "level": "inferred",
+        "kind": "manual_typing",
+        "source": "mantis-managed-cli.manual-fallback",
+        "commandId": null,
+        "sessionId": null,
+        "reason": null
+      },
+      "contentHash": null,
+      "metadata": {
+        "addedLineHashes": [
+          "c3cdbd46711fac2689ab0e26f41e7cf01a4192f1ad34053336e88b7f3b0cf147"
+        ],
+        "deletedLineHashes": [
+          "6461b84cf8eaf08878f6fc1e401810be98a034314e0728901cc9510cd8463396"
+        ],
+        "strategy": "staged-diff-hunk-overlap-v1",
+        "stagedStatus": "M",
+        "oldPath": ".github/workflows/release.yml",
+        "newPath": ".github/workflows/release.yml",
+        "matchedOperationCount": 0,
+        "matchedHunkCount": 0,
+        "matchedOperationIds": [],
+        "matchedHunkIds": [],
+        "matchedInheritedHunkCount": 0,
+        "unattributedFallback": true,
+        "unattributedFallbackSource": "mantis-managed-cli.manual-fallback"
+      }
+    },
+    {
+      "schemaVersion": 2,
+      "recordType": "hunk",
+      "hunkId": "staged:2:.gitignore",
+      "operationId": null,
+      "filePath": null,
+      "relativePath": ".gitignore",
+      "oldStart": 7,
+      "oldLines": 1,
+      "newStart": 7,
+      "newLines": 4,
+      "linesAdded": 4,
+      "linesDeleted": 1,
+      "attribution": {
+        "bucket": "human_only",
+        "contributors": [
+          {
+            "actor": "human",
+            "tool": null,
+            "source": "mantis-managed-cli.manual-fallback",
+            "operationId": null,
+            "evidenceLevel": "inferred"
+          }
+        ],
+        "actors": [
+          "human"
+        ],
+        "aiInvolved": false,
+        "humanInvolved": true,
+        "toolInvolved": false,
+        "unknownInvolved": false
+      },
+      "evidence": {
+        "level": "inferred",
+        "kind": "manual_typing",
+        "source": "mantis-managed-cli.manual-fallback",
+        "commandId": null,
+        "sessionId": null,
+        "reason": null
+      },
+      "contentHash": null,
+      "metadata": {
+        "addedLineHashes": [
+          "d3e542f0a2e03d102428bb708f6e8e5a55cd9b872dad0add7025568297fbd817",
+          "d4eb0b5442961d252f2167de5579c656a7c9ffc9c6ceea8e30c59742ac241d52",
+          "507d4cc5154bcf82d35baaa7b21b109a83544cfe02c016a248f93cd9628394da",
+          "9f046292170788b62ca8fff975b4127d5c7545cba40d9557b98c361df012959b"
+        ],
+        "deletedLineHashes": [
+          "fe54d1fd9b0ea946a38c56b98ec8ad8dff0ce784bc926b25433e44d2703f6f0f"
+        ],
+        "strategy": "staged-diff-hunk-overlap-v1",
+        "stagedStatus": "M",
+        "oldPath": ".gitignore",
+        "newPath": ".gitignore",
+        "matchedOperationCount": 0,
+        "matchedHunkCount": 0,
+        "matchedOperationIds": [],
+        "matchedHunkIds": [],
+        "matchedInheritedHunkCount": 0,
+        "unattributedFallback": true,
+        "unattributedFallbackSource": "mantis-managed-cli.manual-fallback"
+      }
+    },
+    {
+      "schemaVersion": 2,
+      "recordType": "hunk",
+      "hunkId": "staged:3:scripts/generate-icons.mjs",
+      "operationId": null,
+      "filePath": null,
+      "relativePath": "scripts/generate-icons.mjs",
+      "oldStart": 62,
+      "oldLines": 0,
+      "newStart": 63,
+      "newLines": 16,
+      "linesAdded": 16,
+      "linesDeleted": 0,
+      "attribution": {
+        "bucket": "human_only",
+        "contributors": [
+          {
+            "actor": "human",
+            "tool": null,
+            "source": "mantis-managed-cli.manual-fallback",
+            "operationId": null,
+            "evidenceLevel": "inferred"
+          }
+        ],
+        "actors": [
+          "human"
+        ],
+        "aiInvolved": false,
+        "humanInvolved": true,
+        "toolInvolved": false,
+        "unknownInvolved": false
+      },
+      "evidence": {
+        "level": "inferred",
+        "kind": "manual_typing",
+        "source": "mantis-managed-cli.manual-fallback",
+        "commandId": null,
+        "sessionId": null,
+        "reason": null
+      },
+      "contentHash": null,
+      "metadata": {
+        "addedLineHashes": [
+          "b727b847bcc92e2545b64ff47042c8326dd472a5cb864b9a6d15539af7c2f8d2",
+          "8e53f1fe66b6f9521b3d8373da328e67cae4aa47b4bb14d63027f10a03ad7b1e",
+          "d10b36aa74a59bcf4a88185837f658afaf3646eff2bb16c3928d0e9335e945d2",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "100fa60baf07cdc4983eaa92e74ee4933d50d7c6791fb81c4dd18147463089db",
+          "b67845d039dd0a5e15bd501e7a0af3754b2a3769968d9d835c136edc783bd589",
+          "b300de398e4b867b1f92716de0e919b87bb8b79d309e5da1494a77a3b777c49a",
+          "9d47f2ee0cd4e0c7805aeb6d0f07c2c44f7452e238dd20cf4d99fecd1a2b8b6d",
+          "6c01840aa022c6ea9835de8b1639aa15ae750330e3dcfb873aebef5afdf90994",
+          "67694c125cca8ca0a62725dfef58e8526eab4d227697d733f055295d901fc772",
+          "737db166c79ae98e44bbe5ad43e03bf3774f7b3696068842d56a72e863dfeb20",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "6f44781a32aea271f0608107c746f7cfb61e8ad9297e76ca34a10045cdeb37a0",
+          "1532f09268b1a723f7aaa8e9bc9bb8db95e575c4b5b62fd40eb9f47b81d4fffe",
+          "d10b36aa74a59bcf4a88185837f658afaf3646eff2bb16c3928d0e9335e945d2",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "strategy": "staged-diff-hunk-overlap-v1",
+        "stagedStatus": "M",
+        "oldPath": "scripts/generate-icons.mjs",
+        "newPath": "scripts/generate-icons.mjs",
+        "matchedOperationCount": 0,
+        "matchedHunkCount": 0,
+        "matchedOperationIds": [],
+        "matchedHunkIds": [],
+        "matchedInheritedHunkCount": 0,
+        "unattributedFallback": true,
+        "unattributedFallbackSource": "mantis-managed-cli.manual-fallback"
+      }
+    }
+  ],
+  "summary": {
+    "totalHunks": 3,
+    "buckets": {
+      "ai_only": 0,
+      "human_only": 3,
+      "tool_only": 0,
+      "mixed_ai_human": 0,
+      "mixed_ai_tool": 0,
+      "mixed_human_tool": 0,
+      "mixed_ai_human_tool": 0,
+      "unknown": 0
+    },
+    "aiInvolved": 0,
+    "humanInvolved": 3,
+    "toolInvolved": 0,
+    "unknownInvolved": 0,
+    "linesAdded": 21,
+    "linesDeleted": 2
+  },
+  "reconciliation": {
+    "schemaVersion": 2,
+    "strategy": "staged-diff-hunk-overlap-v1",
+    "stagedHunkCount": 3,
+    "matchedHunkCount": 0,
+    "unknownHunkCount": 0,
+    "files": [
+      ".github/workflows/release.yml",
+      ".gitignore",
+      "scripts/generate-icons.mjs"
+    ],
+    "lineSummaryByBucket": {
+      "ai_only": {
+        "hunks": 0,
+        "linesAdded": 0,
+        "linesDeleted": 0
+      },
+      "human_only": {
+        "hunks": 3,
+        "linesAdded": 21,
+        "linesDeleted": 2
+      },
+      "tool_only": {
+        "hunks": 0,
+        "linesAdded": 0,
+        "linesDeleted": 0
+      },
+      "mixed_ai_human": {
+        "hunks": 0,
+        "linesAdded": 0,
+        "linesDeleted": 0
+      },
+      "mixed_ai_tool": {
+        "hunks": 0,
+        "linesAdded": 0,
+        "linesDeleted": 0
+      },
+      "mixed_human_tool": {
+        "hunks": 0,
+        "linesAdded": 0,
+        "linesDeleted": 0
+      },
+      "mixed_ai_human_tool": {
+        "hunks": 0,
+        "linesAdded": 0,
+        "linesDeleted": 0
+      },
+      "unknown": {
+        "hunks": 0,
+        "linesAdded": 0,
+        "linesDeleted": 0
+      }
+    }
+  }
+}
