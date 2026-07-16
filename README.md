@@ -88,6 +88,21 @@ Generated packages are written to `release/`.
 
 Current packages are unsigned. macOS Gatekeeper and Windows SmartScreen may warn until code signing and notarization are configured.
 
+## GitHub Releases
+
+Do not commit the generated `release/` folder or desktop binaries to the repository. They are large build artifacts and are intentionally ignored by Git.
+
+To publish downloadable macOS and Windows builds from GitHub:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+The GitHub Actions release workflow builds the app on macOS and Windows runners, then uploads the generated `.dmg`, `.zip`, and `.exe` files to the matching GitHub Release.
+
+You can also run the **Release** workflow manually in GitHub Actions and provide a tag such as `v0.1.0`.
+
 ## Project Structure
 
 - `src/App.tsx` - main editor UI and workflow.
