@@ -1,0 +1,98 @@
+{
+  "name": "id-photo-lab",
+  "version": "0.1.0",
+  "description": "Desktop ID photo editor and country document photo exporter.",
+  "author": "ID Photo Lab",
+  "license": "AGPL-3.0-only",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "npm run assets:vendor && vite",
+    "electron:dev": "concurrently -k \"npm run dev -- --host 127.0.0.1\" \"wait-on http://127.0.0.1:5173 && cross-env ELECTRON_START_URL=http://127.0.0.1:5173 electron .\"",
+    "build": "npm run assets:vendor && tsc && vite build",
+    "assets:vendor": "node scripts/vendor-background-removal-assets.mjs",
+    "icons:build": "node scripts/generate-icons.mjs",
+    "catalog:build": "node scripts/build-requirement-catalog.mjs",
+    "preview": "vite preview",
+    "package:dir": "npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --dir --publish never",
+    "package:mac": "npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg zip --arm64 --x64 --publish never",
+    "package:mac:arm64": "npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg zip --arm64 --publish never",
+    "package:mac:x64": "npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg zip --x64 --publish never",
+    "package:win": "npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis zip --x64 --publish never",
+    "package:win:arm64": "npm run build && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis zip --arm64 --publish never"
+  },
+  "dependencies": {
+    "@imgly/background-removal": "^1.7.0",
+    "lucide-react": "^0.468.0",
+    "onnxruntime-web": "^1.21.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^6.0.3",
+    "concurrently": "^10.0.3",
+    "cross-env": "^10.1.0",
+    "electron": "^43.1.1",
+    "electron-builder": "^26.15.3",
+    "typescript": "^5.6.3",
+    "vite": "^8.1.4",
+    "wait-on": "^9.0.10"
+  },
+  "build": {
+    "appId": "com.idphotolab.desktop",
+    "productName": "ID Photo Lab",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "!dist/background-removal/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "build/icon.png",
+        "to": "icon.png"
+      },
+      {
+        "from": "public/background-removal",
+        "to": "background-removal"
+      }
+    ],
+    "asar": true,
+    "mac": {
+      "category": "public.app-category.photography",
+      "icon": "build/icon.icns",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}

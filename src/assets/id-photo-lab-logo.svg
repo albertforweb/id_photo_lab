@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">ID Photo Lab logo</title>
+  <desc id="desc">A portrait photo frame with crop guides.</desc>
+  <defs>
+    <linearGradient id="bg" x1="14" y1="10" x2="82" y2="88" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0a8178" />
+      <stop offset="0.58" stop-color="#08736b" />
+      <stop offset="1" stop-color="#035851" />
+    </linearGradient>
+    <linearGradient id="paper" x1="28" y1="14" x2="68" y2="82" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" />
+      <stop offset="1" stop-color="#eef8f5" />
+    </linearGradient>
+  </defs>
+  <rect width="96" height="96" rx="22" fill="url(#bg)" />
+  <circle cx="75" cy="22" r="8" fill="#ffcf70" opacity="0.95" />
+  <rect x="21" y="14" width="54" height="68" rx="9" fill="url(#paper)" stroke="#d8ecff" stroke-width="2.5" />
+  <path
+    d="M32 27h9m-9 0v9m32-9h-9m9 0v9M32 69h9m-9 0v-9m32 9h-9m9 0v-9"
+    fill="none"
+    stroke="#08736b"
+    stroke-linecap="round"
+    stroke-width="3"
+  />
+  <path d="M28 39h40M28 57h40" stroke="#8c5a00" stroke-dasharray="3 4" stroke-linecap="round" stroke-width="2" />
+  <circle cx="48" cy="41" r="11" fill="#d8ecff" stroke="#035851" stroke-width="2.5" />
+  <path
+    d="M28 72c2.7-13.4 10.5-21 20-21s17.3 7.6 20 21"
+    fill="#e3f3ee"
+    stroke="#035851"
+    stroke-linecap="round"
+    stroke-width="2.5"
+  />
+  <path d="M43 37.8c2.7-2.1 7.5-2.1 10.2 0" fill="none" stroke="#035851" stroke-linecap="round" stroke-width="2" />
+</svg>
