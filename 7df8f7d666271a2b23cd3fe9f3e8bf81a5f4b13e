@@ -1,0 +1,333 @@
+{
+  "version": 2,
+  "schemaVersion": 2,
+  "source": "mantis",
+  "sourceVersion": "0.2.221",
+  "generatedAt": "2026-07-16T07:10:06.023Z",
+  "files": [
+    {
+      "file": ".github/workflows/release.yml",
+      "action": "added",
+      "linesAffected": 103,
+      "linesAdded": 103,
+      "linesDeleted": 0,
+      "totalLines": 103,
+      "assistant": null
+    },
+    {
+      "file": "README.md",
+      "action": "edited",
+      "linesAffected": 15,
+      "linesAdded": 15,
+      "linesDeleted": 0,
+      "totalLines": 119,
+      "assistant": null
+    }
+  ],
+  "hunks": [
+    {
+      "schemaVersion": 2,
+      "recordType": "hunk",
+      "hunkId": "staged:1:.github/workflows/release.yml",
+      "operationId": null,
+      "filePath": null,
+      "relativePath": ".github/workflows/release.yml",
+      "oldStart": 0,
+      "oldLines": 0,
+      "newStart": 1,
+      "newLines": 103,
+      "linesAdded": 103,
+      "linesDeleted": 0,
+      "attribution": {
+        "bucket": "human_only",
+        "contributors": [
+          {
+            "actor": "human",
+            "tool": null,
+            "source": "mantis-managed-cli.manual-fallback",
+            "operationId": null,
+            "evidenceLevel": "inferred"
+          }
+        ],
+        "actors": [
+          "human"
+        ],
+        "aiInvolved": false,
+        "humanInvolved": true,
+        "toolInvolved": false,
+        "unknownInvolved": false
+      },
+      "evidence": {
+        "level": "inferred",
+        "kind": "manual_typing",
+        "source": "mantis-managed-cli.manual-fallback",
+        "commandId": null,
+        "sessionId": null,
+        "reason": null
+      },
+      "contentHash": null,
+      "metadata": {
+        "addedLineHashes": [
+          "9e6e791f1b05cede5dfd31eaae37ed4247523c2547406b17126c0601e3f1e1b0",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "fc8135fd1264162a0a9b1fb413cf3ab58a2f07a0d78717ded78108a950ea7b75",
+          "9ceb67319dee716866caff20da8b740ce18611345eb412757845ff03d941e2fa",
+          "4db8dd32853dbdb64a0283e44901519c295efd728e994ad302e26b9a1615479f",
+          "7a1a579743b4bc3227be076d4a6cfe585c47187b027bb2a978419fa29fb3484e",
+          "31ef10165fe98492a75234e221d538925dc4007bfd24de8f56275ef977e9f564",
+          "ef918a05495064ea9962633a7d2114bbde7cb189ea021bf3025697b5ff0cb0d9",
+          "9eb5cc5c80a97a09394923bc1065ad2418d04998cb29e087d39b4bfae59d96e4",
+          "e6cfe60b8af15a61ed1c0512a07731032c9b9ddf216b429bb80c3fee8c764733",
+          "aca727dd471d393b1323ffc4bffd3f40a639a4c7ddd1a217f1c874fc5b53affd",
+          "c704eebdfb542797dcaf0ddf796ea367f9ffc1ad9377a9fccb0df7add19a3f85",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "f017303a589086c31848c6c45402c75f6637908271d20daaf20b3b92cce515ea",
+          "88c34f938570cf0cac329fc863bd3642f587bc7439a383ebd19ceb2b8b55bdf7",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "31d9430f44b068186410d7ecc88458e0cf5e67b439951f03c391cf0ace3f1ffe",
+          "7bfc30d65fb2373be5d92aae605bc909f2bd1dee4b634015f5cd0d2ea1220ad9",
+          "82ff9a59cd8a7352afa659b575b3bee6947edcd6678cc9ec2ccb6d658e9c3a59",
+          "37d70179d6ba997cdeaf699011738cfc8eb57511873ccbbef308281d496c5359",
+          "42c492ba4210e45e32dc9a8b3d520f9dbd5eff9087caed3b0d113f619fcd5c03",
+          "1c8b795a8419347b4adfbb1a2ff251527212194c84552616b30e58648adf397b",
+          "b4fe00add6190ed86c96d380938eff2803c23c1aea7f506c3f041176839354be",
+          "0d448b6b7c9828454edddae8a1e95c97f175455485a0858cec52806a15ec7168",
+          "83414f557c85edaedd86a99fa50085b95c41ec7195c1f9ec5e87d1c0de6e8ee7",
+          "afff3216b28e6d4614a54c6e3ae3c7ad92edbef82344d98c0967563eb3f81f5f",
+          "cf3f4c52aed55fd3a711cd6c183652a090a66a888aa59eecd145bc9c9af010d9",
+          "31a65aa7d977719c0ebf7a26059063c100af9a851f19958e6224e998aa194536",
+          "fc9314c732e6f8a776e6bf3e813174cd6d6e7d21cb7ba255a03ab853aa71fc2c",
+          "d857bf67d7828b97bc40a2739df010b0397f5e877fc469c8f2b622af2391a9e1",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "852e02987ac0996c306470272eec27c20cad7d321dffa4294d8b8626f76f7708",
+          "6763f38cb9bef7b315e28330b03f1c40272f3d70e34edd5ae05bafc3439fe8de",
+          "4c4d9cd078bbc02a512758ff4ccc25e5a3cccd767c2f2e5cb586a734e27e1394",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "9156d131e35bc9e1b1aee952199f4ed57adb0718cdaca9bf3d3b1529856c7197",
+          "9698365dc652993d2dd850a104b91ec4cb249c2875821a59a4f295905217e23d",
+          "2eef3e8a89ab23f32d774c5c3bb56e9d5caaacaef173f8971d2e5e8589e0ff93",
+          "31c32a8eb66affdff70f3ee5523a2deb8b08ffd0ba672c3c70709129ed4768b2",
+          "720b84d5d90c3ec8aed91328e0bc3bccd84b622aa9b44dbe7caa86d4f7634a94",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "94c79f6e4b54b8995b143a58c79d05b1eb926faea90c39cbc853a37b8f446a65",
+          "b264e11dacc0541646c1f4830e5b8cf19fe09523c0b8860577fe8b7e3b2a194c",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "6461b84cf8eaf08878f6fc1e401810be98a034314e0728901cc9510cd8463396",
+          "0b2309443611519f243f6902dc3063aa03d6dc1a400861b492c5ef2d272020c1",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "35c2d72e085872641362c04a0e48f8314e33aeb2aa1f47b4ac36d129d3d97d8e",
+          "92b8acd75177b7a789a90ccfdde5e7ef8cb331e864630585d75af675428b36cc",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "6c53fc177506b00a517a820999538300ce1aba961d7771b25ba5e2af8de334c8",
+          "e985c840d4df30a10bac8c84a5be0fe7f91b2b2d0cefe344b1c351666affcba3",
+          "2eef3e8a89ab23f32d774c5c3bb56e9d5caaacaef173f8971d2e5e8589e0ff93",
+          "e62cea2d367d283ba490ded582660cd798c35542a29b14b0270766560683af30",
+          "830f0242e535a9a12240ee3c599cb4ffd53ded21d8baee5d145ee7f57438a8eb",
+          "4d429628a1526f326bdc54e3d270109f68662b36d326bfca8a7bc24bb9014455",
+          "254b55730a848f7dc18fb932db960bcdadbf5e1f5de02903b73bacdb10f6373a",
+          "44ae472d5954012594721d4042b8bbfc89411f179c12e7491e39587751ed84da",
+          "0b8f6f664f162974e44e2d1ce635dee9c31d89b49d1514edebbdd811f389b2d1",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "2a2895beb7a1466044d3c85bd4f181da4090cf307ac93ba9fdaf394231bc0e50",
+          "9f92c369cc925105c17678920d478d6fab9f63ff9987f94b247833ab0d90edc5",
+          "60f5fed467f29e503f9adfee203ba98deb3bddee1851db827f4b1e08c0380598",
+          "120b04ad83f3cf6bcf749d6c5e849cdc48a41ac256a5c8f75ec9cf9db20e93d2",
+          "852e02987ac0996c306470272eec27c20cad7d321dffa4294d8b8626f76f7708",
+          "9f63f8f53f4b6dd18f84490a9670d69a17a517d58c6b24e74c52fd8ee4b66ec8",
+          "6d6811633253e424976afde2f5245cc34853397c2590bb11794947419bf88afc",
+          "2eef3e8a89ab23f32d774c5c3bb56e9d5caaacaef173f8971d2e5e8589e0ff93",
+          "ca9cc3c0c972146b28514312ea8950e28877a1a72a80fdbb3feecf9164833c36",
+          "66fb837a2544bc8ea98c9d92e8203fd2e6455661aa753b9256eef1058f7eafd0",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "cf7c8a9681ec38d543fde7b020f3f5d725f49920e82476257554560ce18ea36e",
+          "87bc2cf1a3645039cd7f8b11de3ed184b5368135cf06c5db6c757c2847913aba",
+          "8aa7752e4827b4b806cbbd47f04d4530b7ac1e9795ce6a774304219756e36739",
+          "00add0ca3b790cc2ad8743a2e87c3531b3ac0463ab2e19436884c434c3bcb7bc",
+          "7b04c078adf7b4a3e3a1f7783b2cedfb48088d6ee8693f079e1e0adff76ff2c4",
+          "5d106c0bc2fc5d549b4ebc8846b63bb4536cb7eeaa8f524d920bb61dc0c71230",
+          "8061598a886f1511cba2201ec7887b66fc341df3301eb7a7b4367390d0e722b1",
+          "3f90df8a806ed2f96b0964176f1263e2e74aec9e64d7df7e189f0ef1491f1b59",
+          "0ce4374895a16baf0990aa74eb6475ef6a3e6ef1066f623e760dd527a7b46503",
+          "b59ebfa511328c02df3dede32efbef4258b32fd3b735083046107f6e9ba82602",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "a8aec005624b1908d57239d04a9f7aecc8a15c9d1271698bce201df790b578e7",
+          "f11fbf790dde1115af039e88e1f90176becccc14514ce8ee0aba19f43f5fa1f9",
+          "33b44ef00c3f4f2ed2a282b99a1f80ce3df0fa4d25b0a8c69fbf62af1560f7d0",
+          "6eeda237b5db1cd250c65edde512dbe317ea008080b843c1179b319155c1aa41",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "7600de7a152f65d0bc464ef915950ffd1c75af4bc33b13e459449892158386b4",
+          "dad9d5cd200d2dc3021876e0229659f7ff1dcf3aee0adf37ac53c5815659fe3f",
+          "65f5eafcac9a353eaa7a05ae6d404ae3b057fb93ea9d7aca2ae20099197f064d",
+          "e6e6dde733797886d7134b362c0162ad824f422dae85cdf76e5650dc67eef164",
+          "a6e98a976a8c3697cbd2add32d38b092fe623da804041e0200b783eec0268560",
+          "0201506d9d19edb17be5229d42bb8f04606a95ea080f846d7d7708d134af30a4",
+          "b35087cf30e7e066c93d10d55e961db1c109c75b108154ec827991deae5e3b73",
+          "6eeda237b5db1cd250c65edde512dbe317ea008080b843c1179b319155c1aa41",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "47cf748c5ef2b2cf73fa60d3007bd948a71d0d0b21f10fa8508f7cb7d027d57f",
+          "83beea0723f16768f523de33ca9b753efb076db99d9e58e59e9ac719dc3d6e28",
+          "344c7c4380c640a1894a267bb0489794f995932d15125525ffafb98e1d633101",
+          "0c4042f2cad5c188b72abbeb9d41f2b3ed7ed037cf1160e03469ea4d94b7487d",
+          "6eeda237b5db1cd250c65edde512dbe317ea008080b843c1179b319155c1aa41",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "e8190acec0c10f8242a83d70b40021fec20e4f48e2e20b5881ea4f84a0f87876"
+        ],
+        "strategy": "staged-diff-hunk-overlap-v1",
+        "stagedStatus": "A",
+        "oldPath": null,
+        "newPath": ".github/workflows/release.yml",
+        "matchedOperationCount": 0,
+        "matchedHunkCount": 0,
+        "matchedOperationIds": [],
+        "matchedHunkIds": [],
+        "matchedInheritedHunkCount": 0,
+        "unattributedFallback": true,
+        "unattributedFallbackSource": "mantis-managed-cli.manual-fallback"
+      }
+    },
+    {
+      "schemaVersion": 2,
+      "recordType": "hunk",
+      "hunkId": "staged:2:README.md",
+      "operationId": null,
+      "filePath": null,
+      "relativePath": "README.md",
+      "oldStart": 90,
+      "oldLines": 0,
+      "newStart": 91,
+      "newLines": 15,
+      "linesAdded": 15,
+      "linesDeleted": 0,
+      "attribution": {
+        "bucket": "human_only",
+        "contributors": [
+          {
+            "actor": "human",
+            "tool": null,
+            "source": "mantis-managed-cli.manual-fallback",
+            "operationId": null,
+            "evidenceLevel": "inferred"
+          }
+        ],
+        "actors": [
+          "human"
+        ],
+        "aiInvolved": false,
+        "humanInvolved": true,
+        "toolInvolved": false,
+        "unknownInvolved": false
+      },
+      "evidence": {
+        "level": "inferred",
+        "kind": "manual_typing",
+        "source": "mantis-managed-cli.manual-fallback",
+        "commandId": null,
+        "sessionId": null,
+        "reason": null
+      },
+      "contentHash": null,
+      "metadata": {
+        "addedLineHashes": [
+          "6ba527837ccd4d13851931c2d800dd1bc7fdf5ba845c2b3d63eb9f33f885335a",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "8cbe7a9d806bef3e7e47f527a7140c5709544e0933ccc6b6a3ec82addf7db3e0",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "295c3ce85e51627eb97e17f8d24a8a3480e91eb9beb1321da08b0f5b133ad4a5",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "ad332335cfaa348c5bd715c3479844622270d5f7389ae070b81b135d521a221a",
+          "26ff4966d0266f72be0a3b445007d7c8b10e217fe669c8b1c124f8d58af2c967",
+          "1efdda222e163c59a877b03dd7df8763e73a1ac20d0984adb1f969e98742206d",
+          "f1b901847390b0ed7e374e7c1e464ec17b46a427c487a5ad6cbd2906405083d5",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "6132ad8a751e902843cd5b2592e0a2422ffcd3ee74f197e1ecbeb09eb147350e",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "9b02e72fe4fcf935f15fda4681cae0144a79765a6f3ae12faa231846f35b9fbd",
+          "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        ],
+        "strategy": "staged-diff-hunk-overlap-v1",
+        "stagedStatus": "M",
+        "oldPath": "README.md",
+        "newPath": "README.md",
+        "matchedOperationCount": 0,
+        "matchedHunkCount": 0,
+        "matchedOperationIds": [],
+        "matchedHunkIds": [],
+        "matchedInheritedHunkCount": 0,
+        "unattributedFallback": true,
+        "unattributedFallbackSource": "mantis-managed-cli.manual-fallback"
+      }
+    }
+  ],
+  "summary": {
+    "totalHunks": 2,
+    "buckets": {
+      "ai_only": 0,
+      "human_only": 2,
+      "tool_only": 0,
+      "mixed_ai_human": 0,
+      "mixed_ai_tool": 0,
+      "mixed_human_tool": 0,
+      "mixed_ai_human_tool": 0,
+      "unknown": 0
+    },
+    "aiInvolved": 0,
+    "humanInvolved": 2,
+    "toolInvolved": 0,
+    "unknownInvolved": 0,
+    "linesAdded": 118,
+    "linesDeleted": 0
+  },
+  "reconciliation": {
+    "schemaVersion": 2,
+    "strategy": "staged-diff-hunk-overlap-v1",
+    "stagedHunkCount": 2,
+    "matchedHunkCount": 0,
+    "unknownHunkCount": 0,
+    "files": [
+      ".github/workflows/release.yml",
+      "README.md"
+    ],
+    "lineSummaryByBucket": {
+      "ai_only": {
+        "hunks": 0,
+        "linesAdded": 0,
+        "linesDeleted": 0
+      },
+      "human_only": {
+        "hunks": 2,
+        "linesAdded": 118,
+        "linesDeleted": 0
+      },
+      "tool_only": {
+        "hunks": 0,
+        "linesAdded": 0,
+        "linesDeleted": 0
+      },
+      "mixed_ai_human": {
+        "hunks": 0,
+        "linesAdded": 0,
+        "linesDeleted": 0
+      },
+      "mixed_ai_tool": {
+        "hunks": 0,
+        "linesAdded": 0,
+        "linesDeleted": 0
+      },
+      "mixed_human_tool": {
+        "hunks": 0,
+        "linesAdded": 0,
+        "linesDeleted": 0
+      },
+      "mixed_ai_human_tool": {
+        "hunks": 0,
+        "linesAdded": 0,
+        "linesDeleted": 0
+      },
+      "unknown": {
+        "hunks": 0,
+        "linesAdded": 0,
+        "linesDeleted": 0
+      }
+    }
+  }
+}
