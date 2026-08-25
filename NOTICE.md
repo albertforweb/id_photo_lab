@@ -20,6 +20,7 @@ According to the third-party notices distributed with `@imgly/background-removal
 
 ## Other Key Dependencies
 
+- MediaPipe Tasks Vision: Apache-2.0
 - React: MIT
 - React DOM: MIT
 - Vite: MIT

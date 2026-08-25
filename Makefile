@@ -1,12 +1,13 @@
 NPM ?= npm
 
-.PHONY: help install icons build dev electron-dev package package-dir package-macos package-mac package-macos-arm64 package-macos-x64 package-windows package-win package-windows-arm64 package-all clean-release
+.PHONY: help install icons build verify-assets dev electron-dev package package-dir package-macos package-mac package-macos-arm64 package-macos-x64 package-windows package-win package-windows-arm64 package-all clean-release
 
 help:
 	@printf "ID Photo Lab packaging targets\n\n"
 	@printf "  make install              Install dependencies with npm ci\n"
 	@printf "  make icons                Generate macOS and Windows app icons\n"
 	@printf "  make build                Build the Vite app\n"
+	@printf "  make verify-assets        Verify local model assets and package rules\n"
 	@printf "  make dev                  Run the Vite dev server\n"
 	@printf "  make electron-dev         Run the Electron app against the dev server\n"
 	@printf "  make package              Build macOS and Windows release artifacts\n"
@@ -27,6 +28,9 @@ icons:
 
 build:
 	$(NPM) run build
+
+verify-assets: build
+	$(NPM) run assets:verify
 
 dev:
 	$(NPM) run dev

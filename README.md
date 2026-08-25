@@ -8,14 +8,16 @@ ID Photo Lab is a desktop photo editor for preparing passport, visa, and identit
 
 ID Photo Lab helps turn an uploaded portrait into an output photo that matches a selected document profile. It can also run in **Free edit** mode when you only want to crop, adjust, or remove a background without applying official ID-photo sizing rules.
 
-The app is built with React, Vite, TypeScript, Electron, and browser-side ONNX background removal.
+The app is built with React, Vite, TypeScript, Electron, browser-side ONNX background removal, and local MediaPipe face detection.
 
 ## Features
 
 - Country and document photo requirement catalog loaded from editable JSON.
 - Free edit mode with no selected document specification.
 - Drag, zoom, rotate, and flip controls for positioning the subject.
+- Local face detection with detected face/eye overlay and one-click auto-align to document guides.
 - Rulers and guide overlays for document sizing, crown/chin targets, and eye ranges.
+- Export readiness checks for photo loaded, output size, background, alignment, source freshness, and appearance edits.
 - Offline-capable AI background removal in packaged desktop builds.
 - Edge color removal fallback for simple flat-color backgrounds.
 - Background swatches, custom background color, and transparent preview.
@@ -29,11 +31,19 @@ The app is built with React, Vite, TypeScript, Electron, and browser-side ONNX b
 2. Upload a front-facing portrait.
 3. Choose **Free edit** or select a country/document profile.
 4. Position the face with drag, zoom, rotate, and flip controls.
-5. Use **Remove background** when a transparent cutout is needed.
-6. Pick a replacement background color or keep transparent preview enabled.
-7. Download the photo, transparent PNG, or 4x6 sheet.
+5. Use **Detect face** and **Auto-align** when you want the app to fit the portrait to the selected guide.
+6. Use **Remove background** when a transparent cutout is needed.
+7. Pick a replacement background color or keep transparent preview enabled.
+8. Check the readiness panel, then download the photo, transparent PNG, or 4x6 sheet.
 
 Document requirements can change. Always verify final acceptance requirements with the issuing authority before submitting an official application.
+
+## Privacy and Disclaimer
+
+ID Photo Lab is designed for local image processing by default. The current app does not include analytics, account login, advertising SDKs, or server-side photo upload.
+
+- [Privacy Policy](public/privacy.html)
+- [Terms and Disclaimer](public/terms.html)
 
 ## Development
 
@@ -61,17 +71,20 @@ Build the app:
 npm run build
 ```
 
-## Background Removal Assets
+## Local Model Assets
 
-The packaged app includes the required background-removal model/runtime assets locally, so first-use background removal does not need to download the model from the network.
+The packaged app includes the required background-removal and face-detection model/runtime assets locally, so first-use background removal and face detection do not need to download models from the network.
 
 For source builds, the assets are vendored by:
 
 ```bash
 npm run assets:vendor
+npm run assets:verify
 ```
 
-This command downloads the matching `@imgly/background-removal-data` archive once, filters it to the resources used by this app, and writes the result to `public/background-removal/`. That generated folder is intentionally ignored by Git because it is about 98 MB. Release packages include it through Electron Builder `extraResources`.
+This command downloads the matching `@imgly/background-removal-data` archive once, filters it to the resources used by this app, copies the MediaPipe vision runtime from `@mediapipe/tasks-vision`, and downloads the BlazeFace face-detector model. Generated folders under `public/` are intentionally ignored by Git. Release builds include them through Vite/Electron packaging.
+
+`npm run assets:verify` checks that the vendored background-removal assets, MediaPipe assets, built `dist/` files, and Electron packaging rules are still aligned before desktop binaries are produced.
 
 ## Packaging
 

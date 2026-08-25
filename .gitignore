@@ -11,6 +11,7 @@ build/*
 
 # Generated model assets and cache
 public/background-removal/
+public/mediapipe/
 .cache/
 
 # Logs

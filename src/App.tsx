@@ -1,6 +1,7 @@
 import {
   AlertTriangle,
   CheckCircle2,
+  CircleDashed,
   Crop,
   Download,
   Eraser,
@@ -9,10 +10,13 @@ import {
   FlipHorizontal,
   FlipVertical,
   Image as ImageIcon,
+  LocateFixed,
   Palette,
   RefreshCcw,
   RotateCcw,
+  ScanFace,
   Search,
+  ShieldCheck,
   SlidersHorizontal,
   Sparkles,
   Upload,
@@ -36,6 +40,8 @@ import {
   removeSubjectBackground,
   safeFilename,
 } from "./imageCanvas";
+import { createAutoAlignedTransform, projectDetectedFace, type ProjectedFaceOverlay } from "./alignment";
+import { detectPrimaryFace, type DetectedFace } from "./faceDetection";
 import { PHOTO_SPECS, PhotoSpec, specHeadLabel, specSizeLabel } from "./specs";
 
 const DEFAULT_TRANSFORM: ImageTransform = {
@@ -77,6 +83,36 @@ type RulerTick = {
   label: string;
 };
 
+type ReadinessStatus = "pass" | "review" | "pending";
+
+type ReadinessCheck = {
+  status: ReadinessStatus;
+  label: string;
+  detail: string;
+};
+
+type FaceDetectionStatus = "idle" | "detecting" | "done" | "none";
+
+function normalizeColor(color: string): string {
+  return color.trim().toLowerCase();
+}
+
+function hasAdjustmentChanges(adjustments: ImageAdjustments): boolean {
+  return Object.entries(DEFAULT_ADJUSTMENTS).some(([key, value]) => {
+    const adjustmentKey = key as keyof ImageAdjustments;
+    return adjustments[adjustmentKey] !== value;
+  });
+}
+
+function getSourceAgeDays(checkedAt: string): number | null {
+  const checkedAtTime = Date.parse(`${checkedAt}T00:00:00Z`);
+  if (!Number.isFinite(checkedAtTime)) {
+    return null;
+  }
+
+  return Math.max(0, Math.floor((Date.now() - checkedAtTime) / 86_400_000));
+}
+
 function App() {
   const [specId, setSpecId] = useState(FREE_EDIT_ID);
   const spec = useMemo<PhotoSpec | null>(
@@ -92,6 +128,10 @@ function App() {
   const [backgroundStatus, setBackgroundStatus] = useState<"idle" | "processing" | "done">("idle");
   const [subjectStatus, setSubjectStatus] = useState<"idle" | "processing" | "done">("idle");
   const [subjectProgress, setSubjectProgress] = useState("");
+  const [faceStatus, setFaceStatus] = useState<FaceDetectionStatus>("idle");
+  const [faceMessage, setFaceMessage] = useState("");
+  const [detectedFace, setDetectedFace] = useState<DetectedFace | null>(null);
+  const [autoAligned, setAutoAligned] = useState(false);
   const [transparentPreview, setTransparentPreview] = useState(false);
   const [displaySize, setDisplaySize] = useState({ width: 720, height: 720 });
   const [error, setError] = useState("");
@@ -143,6 +183,108 @@ function App() {
     }),
     [adjustments, backgroundColor, transparentPreview],
   );
+  const projectedFace = useMemo(
+    () => activePhoto && detectedFace
+      ? projectDetectedFace(detectedFace, activePhoto, displaySize, transform)
+      : null,
+    [activePhoto, detectedFace, displaySize, transform],
+  );
+  const readinessChecks = useMemo<ReadinessCheck[]>(() => {
+    if (!spec) {
+      return [
+        {
+          status: activePhoto ? "pass" : "pending",
+          label: "Photo loaded",
+          detail: activePhoto
+            ? `${activePhoto.width} x ${activePhoto.height} source image ready for editing.`
+            : "Upload a portrait before exporting.",
+        },
+        {
+          status: activePhoto ? "pass" : "pending",
+          label: "Free edit output",
+          detail: activePhoto
+            ? "Download uses the current editor result without ID-photo sizing rules."
+            : "Free edit keeps the original image dimensions after edits.",
+        },
+        {
+          status: processedPhoto ? "pass" : activePhoto ? "review" : "pending",
+          label: "Background",
+          detail: processedPhoto
+            ? "Background cleanup has been applied."
+            : "Original background remains unless you remove or replace it.",
+        },
+        {
+          status: "pass",
+          label: "Document rules",
+          detail: "No official document specification is selected.",
+        },
+      ];
+    }
+
+    const sourceAgeDays = getSourceAgeDays(spec.checkedAt);
+    const backgroundMatchesDefault = normalizeColor(backgroundColor) === normalizeColor(spec.backgroundColor);
+    const adjustmentChanged = hasAdjustmentChanges(adjustments);
+
+    return [
+      {
+        status: activePhoto ? "pass" : "pending",
+        label: "Photo loaded",
+        detail: activePhoto
+          ? `${activePhoto.width} x ${activePhoto.height} source image ready for export.`
+          : "Upload a front-facing portrait.",
+      },
+      {
+        status: activePhoto ? "pass" : "pending",
+        label: "Output size",
+        detail: `${spec.outputWidthPx} x ${spec.outputHeightPx} px at ${spec.dpi} DPI will be generated.`,
+      },
+      {
+        status: activePhoto ? (backgroundMatchesDefault ? "pass" : "review") : "pending",
+        label: "Background color",
+        detail: backgroundMatchesDefault
+          ? `Selected ${backgroundColor}, matching the spec default: ${spec.background}.`
+          : `Selected ${backgroundColor}; spec says ${spec.background}.`,
+      },
+      {
+        status: processedPhoto ? "pass" : activePhoto ? "review" : "pending",
+        label: "Background cleanup",
+        detail: processedPhoto
+          ? "Background removal or color cleanup has been applied."
+          : "Use background removal if the uploaded background is not compliant.",
+      },
+      {
+        status: activePhoto ? (autoAligned ? "pass" : "review") : "pending",
+        label: "Face alignment",
+        detail: autoAligned
+          ? "Auto-align fitted the detected face to the crown/chin guide targets."
+          : detectedFace
+            ? "Detected face box is visible; confirm crown, chin, and eye range manually."
+            : "Run face detection, then auto-align or use the ruler guides manually.",
+      },
+      {
+        status: activePhoto ? (adjustmentChanged ? "review" : "pass") : "pending",
+        label: "Appearance edits",
+        detail: adjustmentChanged
+          ? "Brightness, color, or softening changes are applied; confirm retouching is allowed."
+          : "No brightness, color, or softening adjustments are applied.",
+      },
+      {
+        status: sourceAgeDays !== null && sourceAgeDays <= 365 ? "pass" : "review",
+        label: "Spec source",
+        detail:
+          sourceAgeDays === null
+            ? `Could not parse checked date: ${spec.checkedAt}.`
+            : `Checked ${sourceAgeDays} day${sourceAgeDays === 1 ? "" : "s"} ago from ${spec.sourceName}.`,
+      },
+    ];
+  }, [activePhoto, adjustments, autoAligned, backgroundColor, detectedFace, processedPhoto, spec]);
+  const readinessPassed = readinessChecks.filter((check) => check.status === "pass").length;
+  const readinessTone: ReadinessStatus = readinessChecks.some((check) => check.status === "pending")
+    ? "pending"
+    : readinessChecks.some((check) => check.status === "review")
+      ? "review"
+      : "pass";
+  const readinessLabel = readinessTone === "pass" ? "Ready" : readinessTone === "review" ? "Review" : "Pending";
 
   useEffect(() => {
     activePhotoRef.current = activePhoto;
@@ -258,6 +400,7 @@ function App() {
   }, [processedPhoto]);
 
   function resetTransform() {
+    setAutoAligned(false);
     setTransform({ ...DEFAULT_TRANSFORM });
   }
 
@@ -277,6 +420,10 @@ function App() {
     setBackgroundStatus("idle");
     setSubjectStatus("idle");
     setSubjectProgress("");
+    setFaceStatus("idle");
+    setFaceMessage("");
+    setDetectedFace(null);
+    setAutoAligned(false);
     setTransparentPreview(false);
 
     if (!file) {
@@ -320,6 +467,7 @@ function App() {
   }
 
   function updateTransform(patch: Partial<ImageTransform>) {
+    setAutoAligned(false);
     setTransform((current) => ({
       ...current,
       ...patch,
@@ -442,6 +590,74 @@ function App() {
     await processBackgroundColor();
   }
 
+  async function runFaceDetection(): Promise<DetectedFace | null> {
+    if (!activePhoto) {
+      setError("Upload a photo before detecting face alignment.");
+      return null;
+    }
+
+    if (faceStatus === "detecting") {
+      return detectedFace;
+    }
+
+    try {
+      setError("");
+      setFaceStatus("detecting");
+      setFaceMessage("Loading local face detector");
+      const face = await detectPrimaryFace(activePhoto.img);
+
+      if (!face) {
+        setDetectedFace(null);
+        setAutoAligned(false);
+        setFaceStatus("none");
+        setFaceMessage("No face detected. Use manual alignment guides.");
+        return null;
+      }
+
+      setDetectedFace(face);
+      setAutoAligned(false);
+      setFaceStatus("done");
+      setFaceMessage(`Face detected with ${Math.round(face.score * 100)}% confidence.`);
+      return face;
+    } catch (faceError) {
+      setFaceStatus("idle");
+      setFaceMessage("");
+      setError(
+        faceError instanceof Error
+          ? faceError.message
+          : "Face detection could not be completed.",
+      );
+      return null;
+    }
+  }
+
+  async function handleDetectFace() {
+    await runFaceDetection();
+  }
+
+  async function handleAutoAlignFace() {
+    if (!activePhoto) {
+      setError("Upload a photo before auto-aligning.");
+      return;
+    }
+
+    if (!spec) {
+      setError("Select a document spec before auto-aligning to ID-photo guides.");
+      return;
+    }
+
+    const face = detectedFace ?? await runFaceDetection();
+    if (!face) {
+      return;
+    }
+
+    const alignedTransform = createAutoAlignedTransform(face, activePhoto, spec, getCurrentDisplaySize());
+    setTransform(alignedTransform);
+    setAutoAligned(true);
+    setFaceStatus("done");
+    setFaceMessage("Auto-aligned to the selected document guide.");
+  }
+
   function handleBackgroundColorChange(color: string) {
     setBackgroundColor(color);
     setTransparentPreview(false);
@@ -492,6 +708,7 @@ function App() {
       return;
     }
 
+    setAutoAligned(false);
     setTransform((current) => ({
       ...current,
       zoom: Number(clamp(current.zoom + delta, 0.55, 3.2).toFixed(3)),
@@ -662,6 +879,11 @@ function App() {
             <input ref={uploadInputRef} accept="image/*" type="file" onChange={loadPhoto} />
           </label>
 
+          <div className="trust-message">
+            <ShieldCheck size={16} aria-hidden="true" />
+            <span>Photos are processed locally by default. Acceptance is decided by the issuing authority.</span>
+          </div>
+
           {error ? (
             <div className="error-message" role="alert">
               <AlertTriangle size={16} aria-hidden="true" />
@@ -750,6 +972,37 @@ function App() {
           </div>
 
           <div className="edit-tools" aria-label="Photo edit operations">
+            <section className="tool-section">
+              <div className="tool-heading">
+                <ScanFace size={16} aria-hidden="true" />
+                <span>Alignment</span>
+              </div>
+              <div className="tool-actions">
+                <button
+                  className="tool-button"
+                  disabled={!activePhoto || faceStatus === "detecting"}
+                  type="button"
+                  onClick={handleDetectFace}
+                >
+                  <ScanFace size={16} aria-hidden="true" />
+                  <span>{faceStatus === "detecting" ? "Detecting" : "Detect face"}</span>
+                </button>
+                <button
+                  className="tool-button secondary"
+                  disabled={!activePhoto || !spec || faceStatus === "detecting"}
+                  title={spec ? "Fit the detected face to this document guide" : "Select a document spec before auto-aligning"}
+                  type="button"
+                  onClick={handleAutoAlignFace}
+                >
+                  <LocateFixed size={16} aria-hidden="true" />
+                  <span>{detectedFace ? "Auto-align" : "Detect & align"}</span>
+                </button>
+              </div>
+              <div className="tool-note">
+                {faceMessage || "Detect the face to show a head box and fit it to the guide."}
+              </div>
+            </section>
+
             <section className="tool-section">
               <div className="tool-heading">
                 <Palette size={16} aria-hidden="true" />
@@ -953,6 +1206,7 @@ function App() {
                     ref={canvasRef}
                   />
                   {spec ? <GuideOverlay spec={spec} /> : null}
+                  {projectedFace ? <FaceDetectionOverlay overlay={projectedFace} autoAligned={autoAligned} /> : null}
                   {!photo ? (
                     <div className="empty-state">
                       <ImageIcon size={42} aria-hidden="true" />
@@ -1013,8 +1267,26 @@ function App() {
             )}
           </div>
 
+          <div className={`readiness-panel ${readinessTone}`}>
+            <div className="readiness-header">
+              <h3>Readiness</h3>
+              <span>{readinessLabel} {readinessPassed}/{readinessChecks.length}</span>
+            </div>
+            <ul className="readiness-list">
+              {readinessChecks.map((check) => (
+                <li className={`readiness-item ${check.status}`} key={check.label}>
+                  <ReadinessIcon status={check.status} />
+                  <span>
+                    <strong>{check.label}</strong>
+                    <small>{check.detail}</small>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           {spec ? <div className="note-block caution">
-            <h3>Checks</h3>
+            <h3>Authority notes</h3>
             <ul>
               {spec.cautionNotes.map((note) => (
                 <li key={note}>{note}</li>
@@ -1061,6 +1333,41 @@ function Metric({ label, value }: { label: string; value: string }) {
     <div>
       <span>{label}</span>
       <strong>{value}</strong>
+    </div>
+  );
+}
+
+function ReadinessIcon({ status }: { status: ReadinessStatus }) {
+  if (status === "pass") {
+    return <CheckCircle2 size={16} aria-hidden="true" />;
+  }
+
+  if (status === "review") {
+    return <AlertTriangle size={16} aria-hidden="true" />;
+  }
+
+  return <CircleDashed size={16} aria-hidden="true" />;
+}
+
+function FaceDetectionOverlay({
+  overlay,
+  autoAligned,
+}: {
+  overlay: ProjectedFaceOverlay;
+  autoAligned: boolean;
+}) {
+  return (
+    <div className="face-detection-layer" aria-hidden="true">
+      <span className={`estimated-head-box ${autoAligned ? "aligned" : ""}`} style={overlay.headBox}>
+        <span>{autoAligned ? "Head aligned" : "Head estimate"}</span>
+      </span>
+      <span className="detected-face-box" style={overlay.faceBox}>
+        <span>Face {overlay.confidence}</span>
+      </span>
+      {overlay.eyeLine ? <span className="detected-eye-line" style={overlay.eyeLine} /> : null}
+      {overlay.leftEye ? <span className="detected-eye-point" style={overlay.leftEye} /> : null}
+      {overlay.rightEye ? <span className="detected-eye-point" style={overlay.rightEye} /> : null}
+      {overlay.center ? <span className="detected-face-center" style={overlay.center} /> : null}
     </div>
   );
 }
