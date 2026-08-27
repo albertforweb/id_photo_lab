@@ -2,11 +2,14 @@ import {
   AlertTriangle,
   CheckCircle2,
   CircleDashed,
+  Columns2,
   Crop,
   Download,
   Eraser,
+  Eye,
   ExternalLink,
   FileDown,
+  Filter,
   FlipHorizontal,
   FlipVertical,
   Image as ImageIcon,
@@ -20,6 +23,7 @@ import {
   SlidersHorizontal,
   Sparkles,
   Upload,
+  X,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
@@ -92,6 +96,24 @@ type ReadinessCheck = {
 };
 
 type FaceDetectionStatus = "idle" | "detecting" | "done" | "none";
+type PreviewMode = "edited" | "split";
+type DocumentFilter = "all" | "passport" | "visa" | "id" | "driving" | "other";
+type BackgroundFilter = "all" | "white" | "blue" | "other";
+type OutputFilter = "all" | "print" | "digital";
+type ExportKind = "photo" | "transparent" | "sheet";
+
+type ExportPreview = {
+  kind: ExportKind;
+  title: string;
+  filename: string;
+  format: string;
+  width: number;
+  height: number;
+  transparent: boolean;
+  profile: string;
+  background: string;
+  note: string;
+};
 
 function normalizeColor(color: string): string {
   return color.trim().toLowerCase();
@@ -102,6 +124,141 @@ function hasAdjustmentChanges(adjustments: ImageAdjustments): boolean {
     const adjustmentKey = key as keyof ImageAdjustments;
     return adjustments[adjustmentKey] !== value;
   });
+}
+
+function getAdjustmentWarnings(adjustments: ImageAdjustments, spec: PhotoSpec | null): string[] {
+  if (!spec) {
+    return [];
+  }
+
+  const warnings: string[] = [];
+  if (
+    adjustments.brightness !== DEFAULT_ADJUSTMENTS.brightness ||
+    adjustments.contrast !== DEFAULT_ADJUSTMENTS.contrast ||
+    adjustments.saturation !== DEFAULT_ADJUSTMENTS.saturation
+  ) {
+    warnings.push("Brightness, contrast, or saturation changes may alter the submitted appearance.");
+  }
+
+  if (
+    adjustments.grayscale !== DEFAULT_ADJUSTMENTS.grayscale ||
+    adjustments.sepia !== DEFAULT_ADJUSTMENTS.sepia
+  ) {
+    warnings.push("Most document profiles expect a natural color photo.");
+  }
+
+  if (adjustments.soften !== DEFAULT_ADJUSTMENTS.soften) {
+    warnings.push("Softening can count as retouching for strict document authorities.");
+  }
+
+  return warnings;
+}
+
+function matchesDocumentFilter(spec: PhotoSpec, filter: DocumentFilter): boolean {
+  if (filter === "all") {
+    return true;
+  }
+
+  const searchable = `${spec.document} ${spec.category ?? ""}`.toLowerCase();
+  if (filter === "passport") {
+    return searchable.includes("passport");
+  }
+
+  if (filter === "visa") {
+    return searchable.includes("visa");
+  }
+
+  if (filter === "id") {
+    return /\b(id|identity|card|residence|resident)\b/.test(searchable);
+  }
+
+  if (filter === "driving") {
+    return /\b(driving|driver|licence|license)\b/.test(searchable);
+  }
+
+  return !matchesDocumentFilter(spec, "passport") &&
+    !matchesDocumentFilter(spec, "visa") &&
+    !matchesDocumentFilter(spec, "id") &&
+    !matchesDocumentFilter(spec, "driving");
+}
+
+function matchesBackgroundFilter(spec: PhotoSpec, filter: BackgroundFilter): boolean {
+  if (filter === "all") {
+    return true;
+  }
+
+  const background = `${spec.background} ${spec.backgroundColor}`.toLowerCase();
+  if (filter === "white") {
+    return background.includes("white") || ["#ffffff", "#f7f8f2", "#f4f4f4"].includes(spec.backgroundColor.toLowerCase());
+  }
+
+  if (filter === "blue") {
+    return background.includes("blue") || ["#d8ecff", "#eef3f7"].includes(spec.backgroundColor.toLowerCase());
+  }
+
+  return !matchesBackgroundFilter(spec, "white") && !matchesBackgroundFilter(spec, "blue");
+}
+
+function renderPreviewLayer(
+  photo: LoadedPhoto,
+  canvasWidth: number,
+  canvasHeight: number,
+  transform: ImageTransform,
+  displaySize: DisplaySize,
+  options: Parameters<typeof drawPhoto>[6],
+): HTMLCanvasElement {
+  const layer = document.createElement("canvas");
+  layer.width = canvasWidth;
+  layer.height = canvasHeight;
+  const layerContext = layer.getContext("2d");
+
+  if (!layerContext) {
+    throw new Error("Canvas rendering is not available in this browser.");
+  }
+
+  drawPhoto(layerContext, photo, canvasWidth, canvasHeight, transform, displaySize, options);
+  return layer;
+}
+
+function drawBeforeAfterPreview(
+  ctx: CanvasRenderingContext2D,
+  originalPhoto: LoadedPhoto,
+  editedPhoto: LoadedPhoto,
+  canvasWidth: number,
+  canvasHeight: number,
+  transform: ImageTransform,
+  displaySize: DisplaySize,
+  editedOptions: Parameters<typeof drawPhoto>[6],
+) {
+  const beforeLayer = renderPreviewLayer(
+    originalPhoto,
+    canvasWidth,
+    canvasHeight,
+    transform,
+    displaySize,
+    {
+      fillColor: DEFAULT_BACKGROUND_COLOR,
+      adjustments: { ...DEFAULT_ADJUSTMENTS },
+      transparentBackground: false,
+    },
+  );
+  const afterLayer = renderPreviewLayer(editedPhoto, canvasWidth, canvasHeight, transform, displaySize, editedOptions);
+  const splitX = Math.round(canvasWidth / 2);
+
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, splitX, canvasHeight);
+  ctx.clip();
+  ctx.drawImage(beforeLayer, 0, 0);
+  ctx.restore();
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(splitX, 0, canvasWidth - splitX, canvasHeight);
+  ctx.clip();
+  ctx.drawImage(afterLayer, 0, 0);
+  ctx.restore();
 }
 
 function getSourceAgeDays(checkedAt: string): number | null {
@@ -133,10 +290,15 @@ function App() {
   const [detectedFace, setDetectedFace] = useState<DetectedFace | null>(null);
   const [autoAligned, setAutoAligned] = useState(false);
   const [transparentPreview, setTransparentPreview] = useState(false);
+  const [previewMode, setPreviewMode] = useState<PreviewMode>("edited");
+  const [pendingExport, setPendingExport] = useState<ExportPreview | null>(null);
   const [displaySize, setDisplaySize] = useState({ width: 720, height: 720 });
   const [error, setError] = useState("");
   const [isDraggingPhoto, setIsDraggingPhoto] = useState(false);
   const [query, setQuery] = useState("");
+  const [documentFilter, setDocumentFilter] = useState<DocumentFilter>("all");
+  const [backgroundFilter, setBackgroundFilter] = useState<BackgroundFilter>("all");
+  const [outputFilter, setOutputFilter] = useState<OutputFilter>("all");
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
   const frameRef = useRef<HTMLDivElement | null>(null);
@@ -145,25 +307,29 @@ function App() {
   const activePhotoRef = useRef<LoadedPhoto | null>(null);
   const filteredSpecs = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
-    if (!normalizedQuery) {
-      return PHOTO_SPECS;
-    }
 
     return PHOTO_SPECS.filter((item) =>
-      [
-        item.country,
-        item.countryCode,
-        item.document,
-        item.category,
-        item.sourceName,
-        item.sizeLabel,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase()
-        .includes(normalizedQuery),
+      matchesDocumentFilter(item, documentFilter) &&
+      matchesBackgroundFilter(item, backgroundFilter) &&
+      (outputFilter === "all" || (outputFilter === "digital" ? item.isDigitalOnly : !item.isDigitalOnly)) &&
+      (!normalizedQuery ||
+        [
+          item.country,
+          item.countryCode,
+          item.document,
+          item.category,
+          item.sourceName,
+          item.sizeLabel,
+          item.background,
+          `${item.widthMm}x${item.heightMm}`,
+          `${item.outputWidthPx}x${item.outputHeightPx}`,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase()
+          .includes(normalizedQuery)),
     );
-  }, [query]);
+  }, [backgroundFilter, documentFilter, outputFilter, query]);
   const countryCount = useMemo(
     () => new Set(PHOTO_SPECS.map((item) => item.countryCode)).size,
     [],
@@ -182,6 +348,10 @@ function App() {
       transparentBackground: transparentPreview,
     }),
     [adjustments, backgroundColor, transparentPreview],
+  );
+  const adjustmentWarnings = useMemo(
+    () => getAdjustmentWarnings(adjustments, spec),
+    [adjustments, spec],
   );
   const projectedFace = useMemo(
     () => activePhoto && detectedFace
@@ -265,7 +435,7 @@ function App() {
         status: activePhoto ? (adjustmentChanged ? "review" : "pass") : "pending",
         label: "Appearance edits",
         detail: adjustmentChanged
-          ? "Brightness, color, or softening changes are applied; confirm retouching is allowed."
+          ? adjustmentWarnings[0] ?? "Appearance changes are applied; confirm retouching is allowed."
           : "No brightness, color, or softening adjustments are applied.",
       },
       {
@@ -277,7 +447,7 @@ function App() {
             : `Checked ${sourceAgeDays} day${sourceAgeDays === 1 ? "" : "s"} ago from ${spec.sourceName}.`,
       },
     ];
-  }, [activePhoto, adjustments, autoAligned, backgroundColor, detectedFace, processedPhoto, spec]);
+  }, [activePhoto, adjustments, adjustmentWarnings, autoAligned, backgroundColor, detectedFace, processedPhoto, spec]);
   const readinessPassed = readinessChecks.filter((check) => check.status === "pass").length;
   const readinessTone: ReadinessStatus = readinessChecks.some((check) => check.status === "pending")
     ? "pending"
@@ -374,6 +544,20 @@ function App() {
     ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 
     if (activePhoto) {
+      if (previewMode === "split" && photo) {
+        drawBeforeAfterPreview(
+          ctx,
+          photo,
+          activePhoto,
+          canvas.width,
+          canvas.height,
+          transform,
+          displaySize,
+          drawOptions,
+        );
+        return;
+      }
+
       drawPhoto(ctx, activePhoto, displaySize.width, displaySize.height, transform, displaySize, drawOptions);
       return;
     }
@@ -381,7 +565,7 @@ function App() {
     ctx.clearRect(0, 0, displaySize.width, displaySize.height);
     ctx.fillStyle = backgroundColor;
     ctx.fillRect(0, 0, displaySize.width, displaySize.height);
-  }, [activePhoto, backgroundColor, displaySize, drawOptions, transform]);
+  }, [activePhoto, backgroundColor, displaySize, drawOptions, photo, previewMode, transform]);
 
   useEffect(() => {
     return () => {
@@ -398,6 +582,21 @@ function App() {
       }
     };
   }, [processedPhoto]);
+
+  useEffect(() => {
+    if (!pendingExport) {
+      return undefined;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setPendingExport(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [pendingExport]);
 
   function resetTransform() {
     setAutoAligned(false);
@@ -425,6 +624,8 @@ function App() {
     setDetectedFace(null);
     setAutoAligned(false);
     setTransparentPreview(false);
+    setPreviewMode("edited");
+    setPendingExport(null);
 
     if (!file) {
       return;
@@ -525,6 +726,101 @@ function App() {
       outputSize.width,
       outputSize.height,
     );
+  }
+
+  function getExportOutputSize(kind: ExportKind, photoForOutput: LoadedPhoto): DisplaySize {
+    if (kind === "sheet") {
+      return { width: 1800, height: 1200 };
+    }
+
+    if (spec) {
+      return {
+        width: spec.outputWidthPx,
+        height: spec.outputHeightPx,
+      };
+    }
+
+    return getFreeEditOutputSize(photoForOutput);
+  }
+
+  function createExportPreview(kind: ExportKind): ExportPreview | null {
+    if (!activePhoto) {
+      setError("Upload a photo before exporting.");
+      return null;
+    }
+
+    if (kind === "transparent" && !processedPhoto) {
+      setError("Remove the background before exporting a transparent PNG.");
+      return null;
+    }
+
+    if (kind === "sheet") {
+      if (!spec) {
+        setError("Select a document spec before exporting a 4x6 print sheet.");
+        return null;
+      }
+
+      if (spec.isDigitalOnly) {
+        setError("This is a pixel-only document spec, so a physical 4x6 print sheet is not available.");
+        return null;
+      }
+    }
+
+    const outputSize = getExportOutputSize(kind, activePhoto);
+    const baseName = spec
+      ? [spec.countryCode, spec.document, kind === "sheet" ? "4x6-sheet" : kind]
+      : [activePhoto.name.replace(/\.[^.]+$/, ""), kind === "photo" ? "edited" : kind];
+    const extension = kind === "transparent" ? "png" : "jpg";
+
+    return {
+      kind,
+      title: kind === "sheet" ? "4x6 Sheet" : kind === "transparent" ? "Transparent PNG" : "Photo Export",
+      filename: `${safeFilename(baseName)}.${extension}`,
+      format: extension.toUpperCase(),
+      width: outputSize.width,
+      height: outputSize.height,
+      transparent: kind === "transparent",
+      profile: spec ? `${spec.country} - ${spec.document}` : "Free edit",
+      background: kind === "transparent" ? "Transparent" : backgroundColor,
+      note: spec
+        ? "Uses the selected document profile and current editor framing."
+        : "Uses free edit mode and current editor framing without document rules.",
+    };
+  }
+
+  function openExportPreview(kind: ExportKind) {
+    setError("");
+    setPendingExport(createExportPreview(kind));
+  }
+
+  async function confirmExportPreview() {
+    if (!pendingExport || !activePhoto) {
+      return;
+    }
+
+    if (pendingExport.kind === "sheet") {
+      if (!spec) {
+        setError("Select a document spec before exporting a 4x6 print sheet.");
+        return;
+      }
+
+      const canvas = createPrintSheet(activePhoto, spec, transform, getCurrentDisplaySize(), {
+        ...drawOptions,
+        transparentBackground: false,
+      });
+      await downloadCanvas(canvas, pendingExport.filename, 0.97);
+      setPendingExport(null);
+      return;
+    }
+
+    const canvas = renderDownloadCanvas(activePhoto, pendingExport.kind === "transparent");
+    await downloadCanvas(
+      canvas,
+      pendingExport.filename,
+      pendingExport.kind === "transparent" ? 1 : 0.95,
+      pendingExport.kind === "transparent" ? "image/png" : "image/jpeg",
+    );
+    setPendingExport(null);
   }
 
   async function processBackgroundColor() {
@@ -715,54 +1011,16 @@ function App() {
     }));
   }
 
-  async function exportPhoto() {
-    if (!activePhoto) {
-      setError("Upload a photo before exporting.");
-      return;
-    }
-
-    const canvas = renderDownloadCanvas(activePhoto, false);
-    const filename = spec
-      ? `${safeFilename([spec.countryCode, spec.document, "photo"])}.jpg`
-      : `${safeFilename([activePhoto.name.replace(/\.[^.]+$/, ""), "edited"])}.jpg`;
-    await downloadCanvas(canvas, filename);
+  function exportPhoto() {
+    openExportPreview("photo");
   }
 
-  async function exportTransparentPhoto() {
-    if (!activePhoto) {
-      setError("Upload a photo before exporting.");
-      return;
-    }
-
-    const canvas = renderDownloadCanvas(activePhoto, true);
-    const filename = spec
-      ? `${safeFilename([spec.countryCode, spec.document, "transparent"])}.png`
-      : `${safeFilename([activePhoto.name.replace(/\.[^.]+$/, ""), "transparent"])}.png`;
-    await downloadCanvas(canvas, filename, 1, "image/png");
+  function exportTransparentPhoto() {
+    openExportPreview("transparent");
   }
 
-  async function exportSheet() {
-    if (!activePhoto) {
-      setError("Upload a photo before exporting.");
-      return;
-    }
-
-    if (!spec) {
-      setError("Select a document spec before exporting a 4x6 print sheet.");
-      return;
-    }
-
-    if (spec.isDigitalOnly) {
-      setError("This is a pixel-only document spec, so a physical 4x6 print sheet is not available.");
-      return;
-    }
-
-    const canvas = createPrintSheet(activePhoto, spec, transform, getCurrentDisplaySize(), {
-      ...drawOptions,
-      transparentBackground: false,
-    });
-    const filename = `${safeFilename([spec.countryCode, spec.document, "4x6-sheet"])}.jpg`;
-    await downloadCanvas(canvas, filename, 0.97);
+  function exportSheet() {
+    openExportPreview("sheet");
   }
 
   useEffect(() => {
@@ -832,6 +1090,63 @@ function App() {
               onChange={(event) => setQuery(event.target.value)}
             />
           </label>
+          <div className="filter-panel" aria-label="Document filters">
+            <div className="filter-heading">
+              <Filter size={15} aria-hidden="true" />
+              <span>Filters</span>
+              {documentFilter !== "all" || backgroundFilter !== "all" || outputFilter !== "all" ? (
+                <button
+                  aria-label="Clear filters"
+                  className="text-button"
+                  type="button"
+                  onClick={() => {
+                    setDocumentFilter("all");
+                    setBackgroundFilter("all");
+                    setOutputFilter("all");
+                  }}
+                >
+                  Clear
+                </button>
+              ) : null}
+            </div>
+            <label>
+              <span>Type</span>
+              <select
+                value={documentFilter}
+                onChange={(event) => setDocumentFilter(event.target.value as DocumentFilter)}
+              >
+                <option value="all">All types</option>
+                <option value="passport">Passport</option>
+                <option value="visa">Visa</option>
+                <option value="id">ID / card</option>
+                <option value="driving">Driving</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+            <label>
+              <span>Background</span>
+              <select
+                value={backgroundFilter}
+                onChange={(event) => setBackgroundFilter(event.target.value as BackgroundFilter)}
+              >
+                <option value="all">Any color</option>
+                <option value="white">White</option>
+                <option value="blue">Blue</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+            <label>
+              <span>Output</span>
+              <select
+                value={outputFilter}
+                onChange={(event) => setOutputFilter(event.target.value as OutputFilter)}
+              >
+                <option value="all">Any output</option>
+                <option value="print">Printable</option>
+                <option value="digital">Digital only</option>
+              </select>
+            </label>
+          </div>
           <div className="profile-list" role="listbox" aria-label="Country and document type">
             <button
               className={`profile-option ${isFreeEdit ? "selected" : ""}`}
@@ -897,6 +1212,26 @@ function App() {
             <div className="control-group">
               <Crop size={17} aria-hidden="true" />
               <span>Crop</span>
+            </div>
+            <div className="segmented-control" aria-label="Preview mode">
+              <button
+                className={previewMode === "edited" ? "active" : ""}
+                disabled={!activePhoto}
+                type="button"
+                onClick={() => setPreviewMode("edited")}
+              >
+                <Eye size={16} aria-hidden="true" />
+                <span>Edited</span>
+              </button>
+              <button
+                className={previewMode === "split" ? "active" : ""}
+                disabled={!activePhoto}
+                type="button"
+                onClick={() => setPreviewMode("split")}
+              >
+                <Columns2 size={16} aria-hidden="true" />
+                <span>Split</span>
+              </button>
             </div>
             <div className="zoom-control" aria-label="Zoom controls">
               <button
@@ -1176,6 +1511,16 @@ function App() {
                 />
                 <output>{adjustments.soften.toFixed(1)}</output>
               </label>
+              {adjustmentWarnings.length > 0 ? (
+                <div className="retouch-warning" role="status">
+                  <AlertTriangle size={16} aria-hidden="true" />
+                  <ul>
+                    {adjustmentWarnings.map((warning) => (
+                      <li key={warning}>{warning}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
             </section>
           </div>
 
@@ -1205,6 +1550,12 @@ function App() {
                     className={photo ? "photo-canvas loaded" : "photo-canvas"}
                     ref={canvasRef}
                   />
+                  {previewMode === "split" && photo ? (
+                    <div className="split-preview-overlay" aria-hidden="true">
+                      <span>Before</span>
+                      <span>After</span>
+                    </div>
+                  ) : null}
                   {spec ? <GuideOverlay spec={spec} /> : null}
                   {projectedFace ? <FaceDetectionOverlay overlay={projectedFace} autoAligned={autoAligned} /> : null}
                   {!photo ? (
@@ -1324,6 +1675,60 @@ function App() {
           </p> : null}
         </aside>
       </section>
+      {pendingExport ? (
+        <div className="modal-backdrop" role="presentation" onMouseDown={() => setPendingExport(null)}>
+          <section
+            aria-labelledby="export-preview-title"
+            aria-modal="true"
+            className="export-modal"
+            role="dialog"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <div className="modal-header">
+              <div>
+                <p className="eyebrow">Export preview</p>
+                <h2 id="export-preview-title">{pendingExport.title}</h2>
+              </div>
+              <button
+                aria-label="Close export preview"
+                className="icon-button square"
+                type="button"
+                onClick={() => setPendingExport(null)}
+              >
+                <X size={18} aria-hidden="true" />
+              </button>
+            </div>
+            <div className="export-summary-grid">
+              <Metric label="Profile" value={pendingExport.profile} />
+              <Metric label="Filename" value={pendingExport.filename} />
+              <Metric label="Format" value={pendingExport.format} />
+              <Metric label="Pixels" value={`${pendingExport.width} x ${pendingExport.height}`} />
+              <Metric label="Transparency" value={pendingExport.transparent ? "Yes" : "No"} />
+              <Metric label="Background" value={pendingExport.background} />
+            </div>
+            <p className="modal-note">{pendingExport.note}</p>
+            {adjustmentWarnings.length > 0 ? (
+              <div className="retouch-warning modal-warning" role="status">
+                <AlertTriangle size={16} aria-hidden="true" />
+                <ul>
+                  {adjustmentWarnings.map((warning) => (
+                    <li key={warning}>{warning}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            <div className="modal-actions">
+              <button className="secondary-action" type="button" onClick={() => setPendingExport(null)}>
+                Cancel
+              </button>
+              <button type="button" onClick={() => void confirmExportPreview()}>
+                <Download size={18} aria-hidden="true" />
+                <span>Download</span>
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </main>
   );
 }

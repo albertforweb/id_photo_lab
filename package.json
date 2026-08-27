@@ -16,6 +16,8 @@
     "catalog:build": "node scripts/build-requirement-catalog.mjs",
     "catalog:validate": "node scripts/validate-photo-specs.mjs",
     "test": "vitest run && npm run catalog:validate",
+    "test:smoke": "playwright test",
+    "test:smoke:headed": "playwright test --headed",
     "test:watch": "vitest",
     "preview": "vite preview",
     "package:preflight": "npm run build && npm run assets:verify",
@@ -23,8 +25,10 @@
     "package:mac": "npm run package:preflight && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg zip --arm64 --x64 --publish never",
     "package:mac:arm64": "npm run package:preflight && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg zip --arm64 --publish never",
     "package:mac:x64": "npm run package:preflight && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac dmg zip --x64 --publish never",
+    "package:mac:signed": "npm run package:preflight && electron-builder --mac dmg zip --arm64 --x64 --publish never",
     "package:win": "npm run package:preflight && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis zip --x64 --publish never",
-    "package:win:arm64": "npm run package:preflight && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis zip --arm64 --publish never"
+    "package:win:arm64": "npm run package:preflight && cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win nsis zip --arm64 --publish never",
+    "package:win:signed": "npm run package:preflight && electron-builder --win nsis zip --x64 --publish never"
   },
   "dependencies": {
     "@imgly/background-removal": "^1.7.0",
@@ -35,6 +39,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^6.0.3",
@@ -75,6 +80,7 @@
     "mac": {
       "category": "public.app-category.photography",
       "icon": "build/icon.icns",
+      "notarize": true,
       "target": [
         "dmg",
         "zip"

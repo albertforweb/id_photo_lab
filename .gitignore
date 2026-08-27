@@ -4,6 +4,8 @@ node_modules/
 # Build output
 dist/
 release/
+playwright-report/
+test-results/
 build/*
 !build/icon.icns
 !build/icon.ico

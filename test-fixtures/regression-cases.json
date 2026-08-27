@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "id": "free-edit-front-facing-original-size",
+      "portrait": "portraits/front-facing-portrait.svg",
+      "mode": "free-edit",
+      "source": { "width": 900, "height": 1200 },
+      "display": { "width": 540, "height": 720 },
+      "transform": { "x": 0, "y": 0, "zoom": 1, "rotation": 0, "flipX": false, "flipY": false },
+      "background": { "fillColor": "#ffffff", "transparentBackground": false },
+      "expected": { "outputWidthPx": 900, "outputHeightPx": 1200, "filledBackground": true }
+    },
+    {
+      "id": "us-passport-centered-white-background",
+      "portrait": "portraits/front-facing-portrait.svg",
+      "mode": "document",
+      "specId": "us-passport",
+      "source": { "width": 900, "height": 1200 },
+      "display": { "width": 720, "height": 720 },
+      "transform": { "x": 0, "y": -16, "zoom": 1.18, "rotation": 0, "flipX": false, "flipY": false },
+      "background": { "fillColor": "#ffffff", "transparentBackground": false },
+      "expected": { "outputWidthPx": 600, "outputHeightPx": 600, "sheetWidthPx": 1800, "sheetHeightPx": 1200, "filledBackground": true }
+    },
+    {
+      "id": "canada-passport-transparent-output",
+      "portrait": "portraits/light-shirt-portrait.svg",
+      "mode": "document",
+      "specId": "ca-passport",
+      "source": { "width": 900, "height": 1200 },
+      "display": { "width": 514, "height": 720 },
+      "transform": { "x": 0, "y": -22, "zoom": 1.05, "rotation": 0.4, "flipX": false, "flipY": false },
+      "background": { "fillColor": "#ffffff", "transparentBackground": true },
+      "expected": { "outputWidthPx": 591, "outputHeightPx": 827, "sheetWidthPx": 1800, "sheetHeightPx": 1200, "filledBackground": false }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1200" viewBox="0 0 900 1200" role="img" aria-label="Synthetic portrait with light shirt">
+  <rect width="900" height="1200" fill="#f8fbfa"/>
+  <rect x="0" y="0" width="900" height="290" fill="#d7edf8"/>
+  <rect x="36" y="92" width="118" height="360" fill="#1f3947"/>
+  <rect x="702" y="62" width="142" height="430" fill="#102631"/>
+  <rect x="138" y="252" width="610" height="545" rx="8" fill="#ffffff"/>
+  <ellipse cx="450" cy="592" rx="185" ry="252" fill="#efc0a5"/>
+  <path d="M283 540c14-188 96-288 170-288 78 0 160 104 170 288-48-63-102-94-170-94-69 0-124 31-170 94z" fill="#243036"/>
+  <ellipse cx="294" cy="584" rx="31" ry="50" fill="#efc0a5"/>
+  <ellipse cx="607" cy="584" rx="31" ry="50" fill="#efc0a5"/>
+  <ellipse cx="382" cy="563" rx="31" ry="17" fill="#ffffff"/>
+  <ellipse cx="520" cy="563" rx="31" ry="17" fill="#ffffff"/>
+  <circle cx="382" cy="563" r="11" fill="#20282b"/>
+  <circle cx="520" cy="563" r="11" fill="#20282b"/>
+  <path d="M366 511c31-15 60-14 87 3" fill="none" stroke="#56403c" stroke-width="15" stroke-linecap="round"/>
+  <path d="M475 514c27-17 58-17 89-2" fill="none" stroke="#56403c" stroke-width="15" stroke-linecap="round"/>
+  <path d="M433 587c-15 63-32 95-9 109 12 7 31 7 43 0" fill="none" stroke="#c58975" stroke-width="11" stroke-linecap="round"/>
+  <path d="M376 768c50 34 99 34 148 0" fill="none" stroke="#a9606b" stroke-width="14" stroke-linecap="round"/>
+  <path d="M190 1200c29-203 116-318 260-318s231 115 260 318z" fill="#c7eafa"/>
+  <path d="M312 927l138 190 138-190" fill="#edf9ff"/>
+  <path d="M218 1200l96-250 136 167 136-167 96 250z" fill="#b9e4f6"/>
+</svg>

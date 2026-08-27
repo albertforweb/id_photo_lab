@@ -101,6 +101,15 @@ Generated packages are written to `release/`.
 
 Current packages are unsigned. macOS Gatekeeper and Windows SmartScreen may warn until code signing and notarization are configured.
 
+Signed packaging targets are available once certificates and notarization credentials are configured:
+
+```bash
+make package-macos-signed
+make package-windows-signed
+```
+
+See [Code Signing and Notarization](docs/code-signing.md) for the release checklist and required secrets.
+
 ## GitHub Releases
 
 Do not commit the generated `release/` folder or desktop binaries to the repository. They are large build artifacts and are intentionally ignored by Git.
@@ -115,6 +124,8 @@ git push origin v0.1.0
 The GitHub Actions release workflow builds the app on macOS and Windows runners, then uploads the generated `.dmg`, `.zip`, and `.exe` files to the matching GitHub Release.
 
 You can also run the **Release** workflow manually in GitHub Actions and provide a tag such as `v0.1.0`.
+
+See [Release Process](docs/release.md) for the quality gate, rerun procedure, and artifact checklist.
 
 ## Project Structure
 

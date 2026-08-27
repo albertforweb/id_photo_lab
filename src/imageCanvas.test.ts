@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import regressionFixtures from "../test-fixtures/regression-cases.json";
 import {
   createPrintSheet,
   mmToPx,
@@ -78,6 +79,29 @@ const sourcePhoto: LoadedPhoto = {
   height: 1300,
 };
 
+type RegressionCase = {
+  id: string;
+  mode: "free-edit" | "document";
+  specId?: string;
+  source: {
+    width: number;
+    height: number;
+  };
+  display: {
+    width: number;
+    height: number;
+  };
+  transform: ImageTransform;
+  background: DrawOptions;
+  expected: {
+    outputWidthPx: number;
+    outputHeightPx: number;
+    sheetWidthPx?: number;
+    sheetHeightPx?: number;
+    filledBackground: boolean;
+  };
+};
+
 function installFakeDocument() {
   vi.stubGlobal("document", {
     createElement: (tagName: string) => {
@@ -94,6 +118,27 @@ function installFakeDocument() {
 
 function canvasCalls(canvas: HTMLCanvasElement, name: string) {
   return (canvas as unknown as FakeCanvas).calls.filter((call) => call.name === name);
+}
+
+function specById(id: string) {
+  const spec = PHOTO_SPECS.find((item) => item.id === id);
+
+  expect(spec).toBeDefined();
+  if (!spec) {
+    throw new Error(`Missing regression spec: ${id}`);
+  }
+
+  return spec;
+}
+
+function photoForCase(item: RegressionCase): LoadedPhoto {
+  return {
+    img: {} as HTMLImageElement,
+    url: `fixture:${item.id}`,
+    name: `${item.id}.svg`,
+    width: item.source.width,
+    height: item.source.height,
+  };
 }
 
 describe("image export rendering", () => {
@@ -164,5 +209,56 @@ describe("image export rendering", () => {
     expect(safeFilename(["../Canada", "Temporary resident visa", "photo.JPG"])).toBe(
       "canada-temporary-resident-visa-photo-jpg",
     );
+  });
+
+  it("renders the regression fixture cases at their expected output sizes", () => {
+    const cases = regressionFixtures.cases as RegressionCase[];
+
+    for (const item of cases) {
+      const photo = photoForCase(item);
+      const canvas = item.mode === "free-edit"
+        ? renderSizedCanvas(
+            photo,
+            item.transform,
+            item.display,
+            item.background,
+            item.expected.outputWidthPx,
+            item.expected.outputHeightPx,
+          )
+        : renderOutputCanvas(
+            photo,
+            specById(item.specId ?? ""),
+            item.transform,
+            item.display,
+            item.background,
+          );
+
+      expect(canvas.width, item.id).toBe(item.expected.outputWidthPx);
+      expect(canvas.height, item.id).toBe(item.expected.outputHeightPx);
+      expect(canvasCalls(canvas, "drawImage").length, item.id).toBe(1);
+      expect(canvasCalls(canvas, "fillRect").length > 0, item.id).toBe(item.expected.filledBackground);
+    }
+  });
+
+  it("keeps document regression cases printable on a 4x6 sheet", () => {
+    const cases = (regressionFixtures.cases as RegressionCase[]).filter((item) => item.mode === "document");
+
+    for (const item of cases) {
+      const photo = photoForCase(item);
+      const spec = specById(item.specId ?? "");
+      const sheet = createPrintSheet(
+        photo,
+        spec,
+        item.transform,
+        item.display,
+        item.background,
+      );
+      const firstPhotoCell = canvasCalls(sheet, "drawImage")[0]?.args[0] as HTMLCanvasElement | undefined;
+
+      expect(sheet.width, item.id).toBe(item.expected.sheetWidthPx);
+      expect(sheet.height, item.id).toBe(item.expected.sheetHeightPx);
+      expect(firstPhotoCell?.width, item.id).toBe(mmToPx(spec.widthMm, 300));
+      expect(firstPhotoCell?.height, item.id).toBe(mmToPx(spec.heightMm, 300));
+    }
   });
 });
